@@ -1,7 +1,7 @@
 # myfullpage
 
 #### 项目介绍
-自己实现的jquery全面屏滚动插件。
+自己实现的jquery全面屏滚动插件。[demo](https://zu1662.github.io/myfullpage/)
 
 #### 使用说明
 
