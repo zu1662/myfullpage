@@ -18,7 +18,6 @@
 
         this.each(function () {
             //实现功能的代码
-            var _this = $(this);
             init(endOptions);
             var pageCounts = $('.section').length;
             var nowPage = endOptions.nowPage;
@@ -47,30 +46,34 @@
                         if (nowPage == pageCounts) {
                             if (endOptions.loopScroll) {
                                 targetPage = 1;
-                                moveTo(nowPage, targetPage);
-                                nowPage = targetPage;
+                                moveTo(nowPage, targetPage,function(){
+                                    nowPage = targetPage;
+                                });
                             } else {
                                 return;
                             }
                         } else {
                             targetPage = nowPage + 1;
-                            moveTo(nowPage, targetPage);
-                            nowPage = targetPage;
+                            moveTo(nowPage, targetPage,function(){
+                                nowPage = targetPage;
+                            });
                         }
                     }
                     if (e.keyCode == 38) {
                         if (nowPage == 1) {
                             if (endOptions.loopScroll) {
                                 targetPage = pageCounts;
-                                moveTo(nowPage, targetPage);
-                                nowPage = targetPage;
+                                moveTo(nowPage, targetPage,function(){
+                                    nowPage = targetPage;
+                                });
                             } else {
                                 return;
                             }
                         } else {
                             targetPage = nowPage - 1;
-                            moveTo(nowPage, targetPage);
-                            nowPage = targetPage;
+                            moveTo(nowPage, targetPage,function(){
+                                nowPage = targetPage;
+                            });
                         }
                     }
                 })
@@ -84,35 +87,47 @@
                         if (nowPage == pageCounts) {
                             if (endOptions.loopScroll) {
                                 targetPage = 1;
-                                moveTo(nowPage, targetPage);
-                                nowPage = targetPage;
+                                moveTo(nowPage, targetPage,function(){
+                                    nowPage = targetPage;
+                                });
                             } else {
                                 return;
                             }
                         } else {
                             targetPage = nowPage + 1;
-                            moveTo(nowPage, targetPage);
-                            nowPage = targetPage;
+                            moveTo(nowPage, targetPage,function(){
+                                nowPage = targetPage;
+                            });
                         }
                     } else { //鼠标滚轮向上，向上滚动
                         if (nowPage == 1) {
                             if (endOptions.loopScroll) {
                                 targetPage = pageCounts;
-                                moveTo(nowPage, targetPage);
-                                nowPage = targetPage;
+                                moveTo(nowPage, targetPage,function(){
+                                    nowPage = targetPage;
+                                });
                             } else {
                                 return;
                             }
                         } else {
                             targetPage = nowPage - 1;
-                            moveTo(nowPage, targetPage);
-                            nowPage = targetPage;
+                            moveTo(nowPage, targetPage,function(){
+                                nowPage = targetPage;
+                            });
                         }
 
                     }
                 }
                 endTime = new Date().getTime();
             });
+
+            //导航按钮点击
+            $(".anchors li").on("click",function(){
+                var targetPage = $(this).index()+1;
+                moveTo(nowPage,targetPage,function(){
+                    nowPage = targetPage;
+                });
+            })
         });
 
 
@@ -122,8 +137,8 @@
             var pageCounts = $('.section').length;
 
             //获取页面高度
-            var clientH = $(window).height();
-            var clientW = $(window).width();
+            var clientH = window.innerHeight;
+            var clientW = window.outerWidth;
 
 
             $("#fullpage").height(clientH);
@@ -140,6 +155,7 @@
                 "overflow": "hidden",
                 "position": "relative"
             })
+            $(".section").css({"overflow": "hidden","position":"relative"});
             //设置页面的颜色
             if (endOptions.setPageColor) {
 
@@ -157,7 +173,7 @@
             //初始化开始页面
             var nowPage = endOptions.nowPage > pageCounts ? 1 : endOptions.nowPage;
             $(".sections").css({
-                'transform': `translateY(${-(nowPage - 1) * clientH}px)`
+                'transform': `translateY(${-(nowPage - 1) * clientH}px)`,
             });
             setTimeout(function () {
                 $(".sections").css({
@@ -204,20 +220,16 @@
                     "cursor":"pointer"
                 })
 
-                $(".anchors li").on("click",function(){
-                    var targetPage = $(this).index()+1;
-                    moveTo(nowPage,targetPage)
-                })
             }
 
         }
 
         //跳转到第几页
-        function moveTo(nowPage, targetPage) {
+        function moveTo(nowPage, targetPage,callback) {
             var clientH = $(window).height();
             var pageCounts = $('.section').length;
             var endTranslateY = -(nowPage - 1) * clientH - (targetPage - nowPage) * clientH;
-            var starttranslateY = -(nowPage - 1) * clientH;
+            var startTranslateY = -(nowPage - 1) * clientH;
 
             //切换页面前回调
             if (beforeMove) {
@@ -240,6 +252,9 @@
                     if ($(".anchors")) {
                         $(`.anchors li:nth-child(${targetPage})`).addClass("active").siblings().removeClass("active");
                         $(`.anchors li:nth-child(${targetPage})`).css({"background-color":"#fff"}).siblings().css({"background-color":"transparent"});
+                    }
+                    if(callback){
+                        callback();
                     }
                     //切换页面完成回调函数
                     if (afterMove) {
